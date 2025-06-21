@@ -1,0 +1,25 @@
+name: deploy-essenteil
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: ["web/**"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger infrastructure deployment
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.INFRASTRUCTURE_PAT }}
+          repository: markmorcos/infrastructure
+          event-type: deploy-essenteil
+          client-payload: |-
+            {
+              "repository": "markmorcos/essenteil",
+              "token": "${{ secrets.DEPLOYMENT_TOKEN }}",
+              "version": "${{ github.sha }}",
+              "config_file": "deployment.yaml"
+            }
