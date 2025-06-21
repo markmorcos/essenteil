@@ -31,7 +31,7 @@ export default function PhoneLogin({ onLoginSuccess }: PhoneLoginProps) {
   const setupRecaptcha = () => {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
+        auth!,
         "recaptcha-container",
         {
           size: "invisible",
@@ -57,7 +57,7 @@ export default function PhoneLogin({ onLoginSuccess }: PhoneLoginProps) {
         throw new Error("reCAPTCHA verifier not initialized");
       }
       const result = await signInWithPhoneNumber(
-        auth,
+        auth!,
         phoneNumber,
         appVerifier
       );

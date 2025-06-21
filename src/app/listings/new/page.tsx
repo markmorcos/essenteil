@@ -159,7 +159,7 @@ export default function NewListingPage() {
   const uploadImage = async (file: File): Promise<string> => {
     const timestamp = Date.now();
     const fileName = `listings/${user?.uid}/${timestamp}_${file.name}`;
-    const imageRef = ref(storage, fileName);
+    const imageRef = ref(storage!, fileName);
 
     try {
       const snapshot = await uploadBytes(imageRef, file);
