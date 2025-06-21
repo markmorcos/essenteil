@@ -1,4 +1,3 @@
-# Install dependencies
 FROM node:alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
