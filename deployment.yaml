@@ -46,6 +46,6 @@ services:
             name: database-secret
             key: DATABASE_URL
     ingress:
-      host: food.morcos.tech
+      host: essenteil.de
       path: /?(.*)
       pathType: ImplementationSpecific
