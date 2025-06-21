@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { formatDistanceToNow, isPast, isToday, isTomorrow } from "date-fns";
 
 import { Listing } from "@/lib/types";
 
@@ -10,37 +11,17 @@ type ListingsProps = {
 };
 
 const formatTimeAgo = (date: Date) => {
-  const now = new Date();
-  const diffInMinutes = Math.floor(
-    (now.getTime() - new Date(date).getTime()) / (1000 * 60)
-  );
-
-  if (diffInMinutes < 1) return "Just now";
-  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) return `${diffInHours}h ago`;
-
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 7) return `${diffInDays}d ago`;
-
-  return new Date(date).toLocaleDateString();
+  return formatDistanceToNow(new Date(date), { addSuffix: true });
 };
 
 const formatExpiresIn = (date: Date) => {
-  const now = new Date();
   const expiryDate = new Date(date);
-  const diffInDays = Math.ceil(
-    (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-  );
 
-  if (diffInDays < 0) return "Expired";
-  if (diffInDays === 0) return "Expires today";
-  if (diffInDays === 1) return "Expires tomorrow";
-  if (diffInDays < 7) return `Expires in ${diffInDays} days`;
-  if (diffInDays < 30) return `Expires in ${Math.ceil(diffInDays / 7)} weeks`;
+  if (isPast(expiryDate)) return "Expired";
+  if (isToday(expiryDate)) return "Expires today";
+  if (isTomorrow(expiryDate)) return "Expires tomorrow";
 
-  return `Expires in ${Math.ceil(diffInDays / 30)} months`;
+  return `Expires ${formatDistanceToNow(expiryDate, { addSuffix: true })}`;
 };
 
 const getContactIcon = (method: string) => {
