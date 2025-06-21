@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Listing } from "../../lib/types";
+import { Listing } from "@/lib/types";
 
 type ListingsProps = {
   listings: Listing[];

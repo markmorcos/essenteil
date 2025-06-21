@@ -5,10 +5,17 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 import PhoneLogin from "../../components/PhoneLogin";
+import { useEffect } from "react";
 
 export default function Login() {
   const { user, loading } = useAuth();
   const navigate = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate.push("/");
+    }
+  }, [loading, user, navigate]);
 
   const handleLoginSuccess = () => {
     navigate.push("/");
