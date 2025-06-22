@@ -24,3 +24,12 @@ export interface Listing {
   created_at: Date;
   updated_at: Date;
 }
+
+export interface ListingsOptions {
+  user_id?: string;
+  lat?: number;
+  lng?: number;
+  radius?: number;
+  limit?: number;
+  offset?: number;
+}

@@ -1,10 +1,29 @@
 import { NextResponse } from "next/server";
 
-import { createListing, getActiveListings } from "@/lib/database";
-import { Listing } from "@/lib/types";
+import { createListing, getListings } from "@/lib/database";
+import { Listing, ListingsOptions } from "@/lib/types";
 
-export async function GET() {
-  const listings = await getActiveListings();
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+
+  const options: ListingsOptions = {};
+
+  // Parse query parameters
+  const user_id = searchParams.get("user_id");
+  const lat = searchParams.get("lat");
+  const lng = searchParams.get("lng");
+  const radius = searchParams.get("radius");
+  const limit = searchParams.get("limit");
+  const offset = searchParams.get("offset");
+
+  if (user_id) options.user_id = user_id;
+  if (lat) options.lat = parseFloat(lat);
+  if (lng) options.lng = parseFloat(lng);
+  if (radius) options.radius = parseFloat(radius);
+  if (limit) options.limit = parseInt(limit, 10);
+  if (offset) options.offset = parseInt(offset, 10);
+
+  const listings = await getListings(options);
 
   return NextResponse.json({ listings });
 }

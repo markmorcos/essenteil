@@ -16,6 +16,7 @@ Essenteil is a community-driven food sharing platform that helps reduce food was
 ### 🏠 Community Focus
 
 - **Location-based listings** with Google Places autocomplete
+- **Geo-spatial search** with radius-based filtering
 - **Food-specific categories** (Fresh Produce, Dairy & Eggs, Meat & Seafood, etc.)
 - **Time-sensitive sharing** with shelf life management
 - **Beautiful, responsive design** optimized for mobile and desktop
@@ -46,6 +47,7 @@ Essenteil is a community-driven food sharing platform that helps reduce food was
 ### Backend & Database
 
 - **PostgreSQL** - Robust relational database
+- **Redis** - Geo-spatial indexing for location-based searches
 - **Next.js API Routes** - Serverless API endpoints
 - **Custom SQL queries** - Direct database operations
 
@@ -66,6 +68,7 @@ Essenteil is a community-driven food sharing platform that helps reduce food was
 
 - Node.js 18+
 - PostgreSQL database
+- Redis server (for geo-location features)
 - Firebase project with Auth and Storage enabled
 
 ### Installation
@@ -89,6 +92,9 @@ Essenteil is a community-driven food sharing platform that helps reduce food was
    ```env
    # Database
    DATABASE_URL=postgresql://username:password@localhost:5432/essenteil
+
+   # Redis
+   REDIS_URL=redis://localhost:6379
 
    # Firebase
    NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
@@ -188,6 +194,37 @@ CREATE TABLE listings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+```
+
+### API Endpoints
+
+#### GET /api/listings
+
+Retrieve listings with optional filtering:
+
+**Query Parameters:**
+
+- `user_id` - Filter by specific user
+- `lat` - Latitude for geo-search (requires lng and radius)
+- `lng` - Longitude for geo-search (requires lat and radius)
+- `radius` - Search radius in kilometers (requires lat and lng)
+- `limit` - Maximum number of results (default: 50)
+- `offset` - Number of results to skip (default: 0)
+
+**Examples:**
+
+```bash
+# Get all active listings
+GET /api/listings
+
+# Get listings from specific user
+GET /api/listings?user_id=abc123
+
+# Get listings within 5km of location
+GET /api/listings?lat=40.7128&lng=-74.0060&radius=5
+
+# Combine filters
+GET /api/listings?lat=40.7128&lng=-74.0060&radius=5&limit=20
 ```
 
 ## 🌟 Contributing
