@@ -337,9 +337,6 @@ export default function NewListingPage() {
                   {errors.location.address.message}
                 </p>
               )}
-              <p className="text-sm text-gray-500 mt-1">
-                Google Places autocomplete will be enabled with a valid API key
-              </p>
             </div>
 
             {/* Contact Information */}
