@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 export default function Header() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
 
   const handleSignOut = async () => {
     try {
@@ -12,6 +12,17 @@ export default function Header() {
       console.error("Error signing out:", error);
     }
   };
+
+  if (loading) {
+    return (
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="animate-pulse bg-gray-200 h-8 w-32 rounded"></div>
+          <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
