@@ -42,20 +42,27 @@ export const createListing = async (
 export const getListings = async (
   options: ListingsOptions = {}
 ): Promise<Listing[]> => {
-  const { user_id, lat, lng, radius, limit = 50, offset = 0 } = options;
+  const {
+    user_id,
+    lat,
+    lng,
+    radius,
+    limit = 50,
+    offset = 0,
+    categories,
+  } = options;
 
   let filteredIds: string[] | null = null;
 
   if (lat && lng && radius) {
     try {
       const redis = await getRedisClient();
-      const results = await redis.geoRadius(
+      filteredIds = await redis.geoRadius(
         REDIS_KEYS.LISTINGS_GEO,
         { longitude: lng, latitude: lat },
         radius,
         "km"
       );
-      filteredIds = results.map((result) => String(result));
     } catch (error) {
       console.error("Failed to query Redis for geo data:", error);
     }
@@ -74,10 +81,14 @@ export const getListings = async (
     queryParams.push(user_id);
   }
 
+  if (categories?.length) {
+    paramCount++;
+    sqlQuery += ` AND categories && $${paramCount}`;
+    queryParams.push(categories);
+  }
+
   if (filteredIds !== null) {
-    if (filteredIds.length === 0) {
-      return [];
-    }
+    if (filteredIds.length === 0) return [];
     paramCount++;
     sqlQuery += ` AND id = ANY($${paramCount})`;
     queryParams.push(filteredIds);

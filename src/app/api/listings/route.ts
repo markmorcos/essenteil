@@ -15,6 +15,7 @@ export async function GET(request: Request) {
   const radius = searchParams.get("radius");
   const limit = searchParams.get("limit");
   const offset = searchParams.get("offset");
+  const categories = searchParams.get("categories");
 
   if (user_id) options.user_id = user_id;
   if (lat) options.lat = parseFloat(lat);
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
   if (radius) options.radius = parseFloat(radius);
   if (limit) options.limit = parseInt(limit, 10);
   if (offset) options.offset = parseInt(offset, 10);
+  if (categories) options.categories = categories.split(",");
 
   const listings = await getListings(options);
 

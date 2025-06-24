@@ -1,10 +1,28 @@
 "use client";
 
+import { useState } from "react";
 import { Listings } from "@/components/Listings";
+import { Search } from "@/components/Search";
 import { useListings } from "@/hooks/useListings";
 
 export default function Home() {
-  const { listings, loading, error } = useListings();
+  const [searchParams, setSearchParams] = useState<{
+    lat?: number;
+    lng?: number;
+    radius?: number;
+    categories?: string[];
+  }>({});
+
+  const { listings, loading, error } = useListings(searchParams);
+
+  const handleSearchChange = (params: {
+    lat?: number;
+    lng?: number;
+    radius?: number;
+    categories?: string[];
+  }) => {
+    setSearchParams(params);
+  };
 
   if (loading) {
     return (
@@ -27,5 +45,12 @@ export default function Home() {
     );
   }
 
-  return <Listings listings={listings} />;
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Search onSearchChange={handleSearchChange} />
+        <Listings listings={listings} />
+      </div>
+    </div>
+  );
 }

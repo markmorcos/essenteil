@@ -32,4 +32,5 @@ export interface ListingsOptions {
   radius?: number;
   limit?: number;
   offset?: number;
+  categories?: string[];
 }

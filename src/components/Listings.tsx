@@ -182,9 +182,24 @@ export const Listings: React.FC<ListingsProps> = ({ listings }) => {
               {/* Location */}
               <div className="flex items-center text-gray-500 text-sm mb-4">
                 <span className="mr-1">📍</span>
-                <span className="truncate">
-                  {listing.location.address || "Location not specified"}
-                </span>
+                {listing.location.address ? (
+                  <button
+                    onClick={() => {
+                      window.open(
+                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                          listing.location.address!
+                        )}`,
+                        "_blank"
+                      );
+                    }}
+                    className="text-left truncate hover:text-blue-600 hover:underline transition-colors duration-200 cursor-pointer"
+                    title="Click to open in Google Maps"
+                  >
+                    {listing.location.address}
+                  </button>
+                ) : (
+                  <span className="truncate">Location not specified</span>
+                )}
               </div>
 
               {/* Footer */}
