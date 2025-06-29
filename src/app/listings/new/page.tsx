@@ -8,6 +8,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Contact, Location } from "@/lib/types";
+import { CATEGORIES, Category } from "@/lib/constants";
 
 // Simple Google Maps type declarations
 declare global {
@@ -33,21 +34,6 @@ declare global {
   }
 }
 
-const CATEGORIES = [
-  "Fresh Produce",
-  "Dairy & Eggs",
-  "Meat & Seafood",
-  "Bakery",
-  "Pantry Staples",
-  "Beverages",
-  "Snacks",
-  "Frozen Foods",
-  "Condiments & Sauces",
-  "Spices & Herbs",
-  "Prepared Meals",
-  "Other",
-];
-
 const SHELF_LIFE_OPTIONS = [
   { label: "1 Day", value: 1 },
   { label: "1 Week", value: 7 },
@@ -61,7 +47,7 @@ const SHELF_LIFE_OPTIONS = [
 interface FormData {
   title: string;
   description: string;
-  categories: string[];
+  categories: Category[];
   location: Location;
   contact: Contact;
   image_file: FileList | null;
@@ -108,7 +94,7 @@ export default function NewListingPage() {
         value: "",
       },
       image_file: null,
-      shelf_life_days: 30,
+      shelf_life_days: 7,
     },
   });
 
@@ -225,7 +211,7 @@ export default function NewListingPage() {
     }
   };
 
-  const handleCategoryToggle = (category: string) => {
+  const handleCategoryToggle = (category: Category) => {
     const currentCategories = watchedCategories;
     const newCategories = currentCategories.includes(category)
       ? currentCategories.filter((c) => c !== category)

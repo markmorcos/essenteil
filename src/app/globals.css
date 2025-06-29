@@ -45,8 +45,8 @@ body {
   background: linear-gradient(
     to right,
     #3b82f6 0%,
-    #3b82f6 20%,
-    #e5e7eb 20%,
+    #3b82f6 25%,
+    #e5e7eb 75%,
     #e5e7eb 100%
   );
 }

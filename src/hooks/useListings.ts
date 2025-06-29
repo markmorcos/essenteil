@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 
 import { Listing } from "@/lib/types";
+import { Category } from "@/lib/constants";
 
 interface SearchParams {
   lat?: number;
   lng?: number;
   radius?: number;
-  categories?: string[];
+  categories?: Category[];
   limit?: number;
   offset?: number;
 }

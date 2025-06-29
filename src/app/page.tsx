@@ -4,13 +4,14 @@ import { useState } from "react";
 import { Listings } from "@/components/Listings";
 import { Search } from "@/components/Search";
 import { useListings } from "@/hooks/useListings";
+import { Category } from "@/lib/constants";
 
 export default function Home() {
   const [searchParams, setSearchParams] = useState<{
     lat?: number;
     lng?: number;
     radius?: number;
-    categories?: string[];
+    categories?: Category[];
   }>({});
 
   const { listings, loading, error } = useListings(searchParams);
@@ -19,7 +20,7 @@ export default function Home() {
     lat?: number;
     lng?: number;
     radius?: number;
-    categories?: string[];
+    categories?: Category[];
   }) => {
     setSearchParams(params);
   };

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createListing, getListings, deleteListing } from "@/lib/database";
 import { Listing, ListingsOptions } from "@/lib/types";
+import { Category } from "@/lib/constants";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
   if (radius) options.radius = parseFloat(radius);
   if (limit) options.limit = parseInt(limit, 10);
   if (offset) options.offset = parseInt(offset, 10);
-  if (categories) options.categories = categories.split(",");
+  if (categories) options.categories = categories.split(",") as Category[];
 
   const listings = await getListings(options);
 

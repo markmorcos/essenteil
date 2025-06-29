@@ -1,3 +1,5 @@
+import { Category } from "./constants";
+
 export interface Location {
   lng: number;
   lat: number;
@@ -14,7 +16,7 @@ export interface Listing {
   id: string;
   user_id: string;
   title: string;
-  categories: string[];
+  categories: Category[];
   location: Location;
   contact: Contact;
   description?: string;
@@ -32,5 +34,5 @@ export interface ListingsOptions {
   radius?: number;
   limit?: number;
   offset?: number;
-  categories?: string[];
+  categories?: Category[];
 }

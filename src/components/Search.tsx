@@ -1,29 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-
-// Categories for filtering
-const CATEGORIES = [
-  "Fresh Produce",
-  "Dairy & Eggs",
-  "Meat & Seafood",
-  "Bakery",
-  "Pantry Staples",
-  "Beverages",
-  "Snacks",
-  "Frozen Foods",
-  "Condiments & Sauces",
-  "Spices & Herbs",
-  "Prepared Meals",
-  "Other",
-];
+import { CATEGORIES, Category } from "@/lib/constants";
 
 interface SearchProps {
   onSearchChange: (params: {
     lat?: number;
     lng?: number;
     radius?: number;
-    categories?: string[];
+    categories?: Category[];
   }) => void;
 }
 
@@ -35,7 +20,7 @@ export function Search({ onSearchChange }: SearchProps) {
   const [isMapVisible, setIsMapVisible] = useState(true);
   const [searchCenter, setSearchCenter] = useState({ lat: 52.52, lng: 13.405 }); // Default: Berlin
   const [radius, setRadius] = useState(5); // Default: 5km
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
 
   // Load Google Maps API
@@ -205,7 +190,7 @@ export function Search({ onSearchChange }: SearchProps) {
   };
 
   // Toggle category selection
-  const toggleCategory = (category: string) => {
+  const toggleCategory = (category: Category) => {
     const newCategories = selectedCategories.includes(category)
       ? selectedCategories.filter((c) => c !== category)
       : [...selectedCategories, category];
@@ -270,9 +255,7 @@ export function Search({ onSearchChange }: SearchProps) {
         </div>
       )}
 
-      {/* Controls */}
       <div className="space-y-4">
-        {/* Radius Slider */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-sm font-medium text-gray-700">
@@ -283,14 +266,14 @@ export function Search({ onSearchChange }: SearchProps) {
           <input
             type="range"
             min="1"
-            max="50"
+            max="20"
             value={radius}
             onChange={(e) => updateRadius(Number(e.target.value))}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
           />
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>1 km</span>
-            <span>50 km</span>
+            <span>20 km</span>
           </div>
         </div>
 
