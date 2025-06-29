@@ -49,6 +49,12 @@ export default function Header() {
                     <span>Share Food</span>
                   </button>
                 </Link>
+                <Link href="/listings/manage">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2">
+                    <span>📋</span>
+                    <span>My Listings</span>
+                  </button>
+                </Link>
                 <button
                   onClick={handleSignOut}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors duration-200"

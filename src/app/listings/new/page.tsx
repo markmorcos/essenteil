@@ -188,12 +188,10 @@ export default function NewListingPage() {
     }
 
     try {
-      // Calculate expiry date based on shelf life
       const expiresAt = new Date(
         Date.now() + data.shelf_life_days * 24 * 60 * 60 * 1000
       );
 
-      // Handle image upload if present
       let image_url = "";
       if (data.image_file && data.image_file.length > 0) {
         image_url = await uploadImage(data.image_file[0]);

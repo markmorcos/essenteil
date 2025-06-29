@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { createListing, getListings } from "@/lib/database";
+import { createListing, getListings, deleteListing } from "@/lib/database";
 import { Listing, ListingsOptions } from "@/lib/types";
 
 export async function GET(request: Request) {
@@ -36,4 +36,36 @@ export async function POST(request: Request) {
   const listing = await createListing(data);
 
   return NextResponse.json({ listing });
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const listingId = searchParams.get("id");
+    const userId = searchParams.get("userId");
+
+    if (!listingId || !userId) {
+      return NextResponse.json(
+        { error: "Missing listing ID or user ID" },
+        { status: 400 }
+      );
+    }
+
+    const result = await deleteListing(listingId, userId);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.message },
+        { status: result.message.includes("not found") ? 404 : 403 }
+      );
+    }
+
+    return NextResponse.json({ message: result.message });
+  } catch (error) {
+    console.error("Error in DELETE /api/listings:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

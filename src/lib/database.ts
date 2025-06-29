@@ -1,6 +1,8 @@
 import { query } from "./db";
 import { Listing, ListingsOptions } from "./types";
 import { getRedisClient, REDIS_KEYS } from "./redis";
+import { ref, deleteObject } from "firebase/storage";
+import { storage } from "./firebase";
 
 export const createListing = async (
   listingData: Partial<Listing>
@@ -107,4 +109,54 @@ export const getListings = async (
   const result = await query(sqlQuery, queryParams);
 
   return result.rows;
+};
+
+export const deleteListing = async (
+  listingId: string,
+  userId: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const listingResult = await query(
+      `SELECT * FROM listings WHERE id = $1 AND user_id = $2`,
+      [listingId, userId]
+    );
+
+    if (listingResult.rows.length === 0) {
+      return { success: false, message: "Listing not found or not authorized" };
+    }
+
+    const listing = listingResult.rows[0];
+
+    await query(`DELETE FROM listings WHERE id = $1 AND user_id = $2`, [
+      listingId,
+      userId,
+    ]);
+
+    try {
+      const redis = await getRedisClient();
+      await redis.zRem(REDIS_KEYS.LISTINGS_GEO, listingId);
+    } catch (error) {
+      console.error("Failed to remove geo data from Redis:", error);
+    }
+
+    if (listing.image_url) {
+      try {
+        const url = new URL(listing.image_url);
+        const fileName = decodeURIComponent(
+          url.pathname.split("/").pop() || ""
+        );
+        if (fileName) {
+          const imageRef = ref(storage!, fileName);
+          await deleteObject(imageRef);
+        }
+      } catch (error) {
+        console.error("Failed to delete image from storage:", error);
+      }
+    }
+
+    return { success: true, message: "Listing deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting listing:", error);
+    return { success: false, message: "Failed to delete listing" };
+  }
 };

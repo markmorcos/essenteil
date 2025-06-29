@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // Categories for filtering
 const CATEGORIES = [
@@ -38,30 +38,6 @@ export function Search({ onSearchChange }: SearchProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
 
-  // Update search center callback
-  const updateSearchCenter = useCallback(
-    (newCenter: { lat: number; lng: number }) => {
-      setSearchCenter(newCenter);
-
-      if (marker) {
-        marker.setPosition(newCenter);
-      }
-      if (circle) {
-        circle.setCenter(newCenter);
-      }
-
-      // Trigger search update
-      onSearchChange({
-        lat: newCenter.lat,
-        lng: newCenter.lng,
-        radius,
-        categories:
-          selectedCategories.length > 0 ? selectedCategories : undefined,
-      });
-    },
-    [marker, circle, radius, selectedCategories, onSearchChange]
-  );
-
   // Load Google Maps API
   useEffect(() => {
     const loadGoogleMaps = () => {
@@ -92,25 +68,6 @@ export function Search({ onSearchChange }: SearchProps) {
         fullscreenControl: false,
       });
 
-      // Add click listener to set search center
-      newMap.addListener("click", (event: google.maps.MapMouseEvent) => {
-        const lat = event.latLng?.lat() || 0;
-        const lng = event.latLng?.lng() || 0;
-        updateSearchCenter({ lat, lng });
-      });
-
-      // Add center change listener for map dragging
-      newMap.addListener("center_changed", () => {
-        const center = newMap.getCenter();
-        if (center) {
-          const lat = center.lat();
-          const lng = center.lng();
-          updateSearchCenter({ lat, lng });
-        }
-      });
-
-      setMap(newMap);
-
       // Create circle for radius visualization
       const newCircle = new window.google!.maps.Circle({
         strokeColor: "#3B82F6",
@@ -122,7 +79,6 @@ export function Search({ onSearchChange }: SearchProps) {
         center: searchCenter,
         radius: radius * 1000, // Convert km to meters
       });
-      setCircle(newCircle);
 
       // Create marker for search center
       const newMarker = new window.google!.maps.Marker({
@@ -140,9 +96,51 @@ export function Search({ onSearchChange }: SearchProps) {
           scaledSize: new window.google!.maps.Size(24, 24),
         },
       });
+
+      // Add center change listener for map dragging - keep pin centered
+      newMap.addListener("center_changed", () => {
+        const center = newMap.getCenter();
+        if (center) {
+          const lat = center.lat();
+          const lng = center.lng();
+          // Update marker position to stay centered
+          newMarker.setPosition({ lat, lng });
+          // Update circle position to stay centered
+          newCircle.setCenter({ lat, lng });
+          // Update search center but don't trigger search yet
+          setSearchCenter({ lat, lng });
+        }
+      });
+
+      // Add dragend listener to trigger search only when drag ends
+      newMap.addListener("dragend", () => {
+        const center = newMap.getCenter();
+        if (center) {
+          const lat = center.lat();
+          const lng = center.lng();
+          // Trigger search update only when drag ends
+          onSearchChange({
+            lat,
+            lng,
+            radius,
+            categories:
+              selectedCategories.length > 0 ? selectedCategories : undefined,
+          });
+        }
+      });
+
+      setMap(newMap);
+      setCircle(newCircle);
       setMarker(newMarker);
     }
-  }, [isGoogleMapsLoaded, map, searchCenter, radius, updateSearchCenter]);
+  }, [
+    isGoogleMapsLoaded,
+    map,
+    searchCenter,
+    radius,
+    onSearchChange,
+    selectedCategories,
+  ]);
 
   // Update radius
   const updateRadius = (newRadius: number) => {
@@ -170,16 +168,36 @@ export function Search({ onSearchChange }: SearchProps) {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          updateSearchCenter(newCenter);
+
           if (map) {
             map.setCenter(newCenter);
             map.setZoom(14);
           }
+
+          // Update marker and circle positions
+          if (marker) {
+            marker.setPosition(newCenter);
+          }
+          if (circle) {
+            circle.setCenter(newCenter);
+          }
+
+          // Update search center state
+          setSearchCenter(newCenter);
+
+          // Trigger search update
+          onSearchChange({
+            lat: newCenter.lat,
+            lng: newCenter.lng,
+            radius,
+            categories:
+              selectedCategories.length > 0 ? selectedCategories : undefined,
+          });
         },
         (error) => {
           console.error("Error getting location:", error);
           alert(
-            "Unable to get your current location. Please allow location access or click on the map to set your search area."
+            "Unable to get your current location. Please allow location access or drag the map to set your search area."
           );
         }
       );
@@ -239,7 +257,8 @@ export function Search({ onSearchChange }: SearchProps) {
           />
           <div className="flex items-center justify-between mt-2 text-sm text-gray-600">
             <span>
-              💡 Click anywhere on the map or drag to set your search area
+              💡 Drag the map to move the search area - the pin will stay
+              centered
             </span>
             <button
               onClick={getCurrentLocation}
